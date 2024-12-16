@@ -6,7 +6,7 @@ from pathlib import Path
 from apple.entity.config_entity import PrepareBaseModelConfig
 
 class PrepareBaseModel:
-    def __init__(self, config : PrepareBaseModelConfig):
+    def __init__(self, config: PrepareBaseModelConfig):
         self.config = config
 
     def get_base_model(self):
