@@ -2,7 +2,8 @@ from apple.constants import *
 from apple.entity.config_entity import (DataIngestionConfig, 
                                         PrepareBaseModelConfig, 
                                         PrepareCallbacksConfig,
-                                        TrainingConfig
+                                        TrainingConfig,
+                                        EvaluationConfig
                                         )
 import os
 from apple.utils.common import read_yaml, create_directories
@@ -74,7 +75,7 @@ class ConfigurationManager:
         training = self.config.training
         prepare_base_model = self.config.prepare_base_model
         params = self.params
-        training_data = os.path.join(self.config.data_ingestion.unzip_dir, "apple-images")
+        training_data = os.path.join(self.config.data_ingestion.unzip_dir)
         create_directories([
             Path(training.root_dir)
         ])
@@ -91,3 +92,13 @@ class ConfigurationManager:
         )
 
         return training_config
+    
+    def get_validation_config(self) -> EvaluationConfig:
+        eval_config = EvaluationConfig(
+            path_of_model="artifacts/training/model.keras",
+            training_data="artifacts/data_ingestion",
+            all_params=self.params,
+            params_image_size=self.params.IMAGE_SIZE,
+            params_batch_size=self.params.BATCH_SIZE
+        )
+        return eval_config

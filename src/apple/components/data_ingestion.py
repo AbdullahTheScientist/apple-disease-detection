@@ -1,7 +1,7 @@
 import os
 import zipfile
 import urllib.request as request
-from src.apple import logger
+from apple import logger
 from apple.utils.common import create_directories, get_size
 from apple.entity.config_entity import DataIngestionConfig
 from pathlib import Path
