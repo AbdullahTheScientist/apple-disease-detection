@@ -1,0 +1,117 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/apple/pipeline/stage_01_data_ingestion.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01adc691e470e9321de745ea7d98a931
+      size: 849
+    - path: src/apple/pipeline/stage_01_data_ingestion.py
+      hash: md5
+      md5: eac0a23a9584ea661aa4490dd8fbfdc9
+      size: 888
+    outs:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 51e7f6e2d8ef060dec452b9da814bc45.dir
+      size: 11509872
+      nfiles: 401
+  prepare_base_model:
+    cmd: python src/apple/pipeline/stage_02_prepare_base_model.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01adc691e470e9321de745ea7d98a931
+      size: 849
+    - path: src/apple/pipeline/stage_02_prepare_base_model.py
+      hash: md5
+      md5: 9453640d9c3cf90011863858574f75ee
+      size: 977
+    params:
+      params.yaml:
+        CLASSES: 4
+        IMAGE_SIZE:
+        - 299
+        - 299
+        - 3
+        INCLUDE_TOP: false
+        LEARNING_RATE: 0.01
+        WEIGHTS: imagenet
+    outs:
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: d93a75a8e3f8cecee8e6167c8f2f64a9.dir
+      size: 176625702
+      nfiles: 2
+  training:
+    cmd: python src/apple/pipeline/stage_03_training.py
+    deps:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 51e7f6e2d8ef060dec452b9da814bc45.dir
+      size: 11509872
+      nfiles: 401
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: d93a75a8e3f8cecee8e6167c8f2f64a9.dir
+      size: 176625702
+      nfiles: 2
+    - path: config/config.yaml
+      hash: md5
+      md5: 01adc691e470e9321de745ea7d98a931
+      size: 849
+    - path: src/apple/components/prepare_callbacks.py
+      hash: md5
+      md5: f9579232e4a7700319ea1e2a8eadb39d
+      size: 1000
+    - path: src/apple/pipeline/stage_03_training.py
+      hash: md5
+      md5: fb1e7eb4f3edfa61b73d71029b6ee74b
+      size: 1234
+    params:
+      params.yaml:
+        AUGMENTATION: true
+        BATCH_SIZE: 16
+        EPOCHS: 1
+        IMAGE_SIZE:
+        - 299
+        - 299
+        - 3
+    outs:
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: 03d41072007151615cfb99cca29978b1
+      size: 88323306
+  evaluation:
+    cmd: python src/apple/pipeline/stage_04_evaluation.py
+    deps:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 51e7f6e2d8ef060dec452b9da814bc45.dir
+      size: 11509872
+      nfiles: 401
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: 03d41072007151615cfb99cca29978b1
+      size: 88323306
+    - path: config/config.yaml
+      hash: md5
+      md5: 01adc691e470e9321de745ea7d98a931
+      size: 849
+    - path: src/apple/pipeline/stage_04_evaluation.py
+      hash: md5
+      md5: 1090231c07fdaf3969c4a39dc7e0ecdd
+      size: 845
+    params:
+      params.yaml:
+        BATCH_SIZE: 16
+        IMAGE_SIZE:
+        - 299
+        - 299
+        - 3
+    outs:
+    - path: scores.json
+      hash: md5
+      md5: d076303b2d1f5e943bb45f10ecc61d09
+      size: 73
