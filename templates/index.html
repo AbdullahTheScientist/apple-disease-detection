@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Disease Prediction</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            text-align: center;
+        }
+        #uploadedImage { 
+            max-width: 300px; 
+            margin: 20px 0; 
+            max-height: 300px;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #predictButton {
+            margin: 10px 0;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #predictButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Apple Disease Prediction</h1>
+    <input type="file" id="imageUpload" accept="image/*">
+    <br>
+    <img id="uploadedImage" style="display:none;">
+    <br>
+    <button id="predictButton" style="display:none;">Predict Disease</button>
+    <div class="loader" id="loader"></div>
+    <div id="result"></div>
+
+<script>
+        const imageUpload = document.getElementById('imageUpload');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const resultDiv = document.getElementById('result');
+        const predictButton = document.getElementById('predictButton');
+        const loader = document.getElementById('loader');
+    
+        imageUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = 'block';
+                    predictButton.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    
+        predictButton.addEventListener('click', function() {
+            const file = imageUpload.files[0];
+            if (file) {
+                // Disable predict button and show loader
+                predictButton.disabled = true;
+                loader.style.display = 'block';
+                resultDiv.textContent = ''; // Clear previous result
+    
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result.split(',')[1];
+                    
+                    fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ image: base64Image })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide loader and re-enable predict button
+                        loader.style.display = 'none';
+                        predictButton.disabled = false;
+                        
+                        // Display prediction result
+                        resultDiv.textContent = `Prediction: ${data.prediction}`;
+                    })
+                    .catch(error => {
+                        // Hide loader and re-enable predict button
+                        loader.style.display = 'none';
+                        predictButton.disabled = false;
+                        
+                        // Display error
+                        resultDiv.textContent = `Error: ${error.message}`;
+                        console.error('Prediction error:', error);
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>

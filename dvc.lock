@@ -73,7 +73,7 @@ stages:
       params.yaml:
         AUGMENTATION: true
         BATCH_SIZE: 16
-        EPOCHS: 1
+        EPOCHS: 15
         IMAGE_SIZE:
         - 299
         - 299
@@ -81,7 +81,7 @@ stages:
     outs:
     - path: artifacts/training/model.keras
       hash: md5
-      md5: 03d41072007151615cfb99cca29978b1
+      md5: c57867c6ce3475441acee3fa6a69c7ac
       size: 88323306
   evaluation:
     cmd: python src/apple/pipeline/stage_04_evaluation.py
@@ -93,7 +93,7 @@ stages:
       nfiles: 401
     - path: artifacts/training/model.keras
       hash: md5
-      md5: 03d41072007151615cfb99cca29978b1
+      md5: c57867c6ce3475441acee3fa6a69c7ac
       size: 88323306
     - path: config/config.yaml
       hash: md5
@@ -113,5 +113,5 @@ stages:
     outs:
     - path: scores.json
       hash: md5
-      md5: d076303b2d1f5e943bb45f10ecc61d09
-      size: 73
+      md5: ca5411c595e4da137284fd155c81789b
+      size: 72
